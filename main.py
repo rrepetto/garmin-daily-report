@@ -55,6 +55,12 @@ def get_latest_sleep(garmin):
         data = garmin.get_sleep_data(date_str)
         sleep = (data or {}).get("dailySleepDTO") or {}
 
+    print(
+    f"Fecha: {date_str}, "
+    f"Sueño: {sleep.get('sleepTimeSeconds')}, "
+    f"CalendarDate: {sleep.get('calendarDate')}"
+    )
+
         if sleep.get("sleepTimeSeconds"):
             return date_str, sleep
 
