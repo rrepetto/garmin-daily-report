@@ -38,12 +38,18 @@ def status(value, minimum, maximum, tolerance):
     return "🔴 ❌"
 
 
-def phase_status(seconds, total, minimum, maximum):
-    if seconds is None or not total:
+def phase_status(seconds, minimum_minutes, maximum_minutes):
+    if seconds is None:
         return "⚪"
 
-    pct = seconds / total * 100
-    return status(pct, minimum, maximum, 5)
+    minutes = seconds / 60
+
+    return status(
+        minutes,
+        minimum_minutes,
+        maximum_minutes,
+        minimum_minutes * 0.20
+    )
 
 def get_latest_sleep(garmin):
     today = datetime.now(TIMEZONE).date()
@@ -94,15 +100,16 @@ def main():
 
 | Métrica | Duración | Estado | % | Referencia adultos |
 |---|---|---|---|---|
-| Sueño total | {duration(total)} | {total_status} | 100% | 7–9 h |
-| Sueño profundo | {duration(deep)} | {phase_status(deep, total, 15, 25)} | {percentage(deep, total)} | 15–25% |
-| Sueño ligero | {duration(light)} | {phase_status(light, total, 50, 60)} | {percentage(light, total)} | ~50–60% |
-| Sueño REM | {duration(rem)} | {phase_status(rem, total, 20, 25)} | {percentage(rem, total)} | 20–25% |
+| Sueño profundo | {duration(deep)} | {phase_status(deep, 72, 120)} | {percentage(deep, total)} | 72–120 min |
+| Sueño ligero | {duration(light)} | ⚪ | {percentage(light, total)} | Sin objetivo |
+| Sueño REM | {duration(rem)} | {phase_status(rem, 96, 120)} | {percentage(rem, total)} | 96–120 min |
 | Tiempo despierto | {duration(awake)} | ⚪ | — | Variable |
 
 ---
 
-**Estados:** 🟢 En rango · 🟡 Cerca del rango · 🔴 Fuera del rango · ⚪ Sin evaluación.
+**Estados:** 🟢 Objetivo alcanzado · 🟡 Hasta 20% por debajo · 🔴 Más de 20% por debajo · ⚪ Sin evaluación o por encima de la referencia.
+
+*Los objetivos de REM y sueño profundo son referencias personalizadas calculadas a partir de 8 horas de sueño, no mínimos médicos validados.*
 
 *Referencias orientativas. Los porcentajes de fases no son
 umbrales médicos y Garmin proporciona estimaciones.*
