@@ -124,6 +124,9 @@ Generado automáticamente desde Garmin Connect.
     for path in reports:
         index += f"- [{path.stem}](reports/{path.name})\n"
 
+if __name__ == "__main__":
+    main()
+
     Path("index.md").write_text(index, encoding="utf-8")
 
     print(f"Índice actualizado con {len(reports)} reportes")
