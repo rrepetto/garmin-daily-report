@@ -11,12 +11,17 @@ TIMEZONE = ZoneInfo("America/Argentina/Buenos_Aires")
 DAYS_BACK = 7
 
 
-def duration(seconds):
+def duration(seconds, show_minutes=False):
     if seconds is None:
         return "Sin datos"
 
     minutes = round(seconds / 60)
-    return f"{minutes // 60} h {minutes % 60:02d} min ({minutes} min)"
+    result = f"{minutes // 60} h {minutes % 60:02d} min"
+
+    if show_minutes:
+        result += f" ({minutes} min)"
+
+    return result
 
 
 def percentage(seconds, total):
@@ -56,7 +61,10 @@ def phase_status(seconds, minimum_minutes, maximum_minutes):
 
 def generate_report(date_str, sleep):
     total = sleep.get("sleepTimeSeconds")
-
+    total_pct = (
+        f"{total / (8 * 3600) * 100:.0f}%"
+        if total is not None else "Sin datos"
+    )
     deep = sleep.get("deepSleepSeconds")
     light = sleep.get("lightSleepSeconds")
     rem = sleep.get("remSleepSeconds")
@@ -73,11 +81,11 @@ def generate_report(date_str, sleep):
 
 | Métrica | Duración | Estado | % | Referencia adultos |
 |---|---|---|---|---|
-| Sueño total | {duration(total)} | {total_status} | 100% | 7–9 h |
-| Sueño profundo | {duration(deep)} | {phase_status(deep, 72, 120)} | {percentage(deep, total)} | 72–120 min |
-| Sueño ligero | {duration(light)} | ⚪ | {percentage(light, total)} | Sin objetivo |
-| Sueño REM | {duration(rem)} | {phase_status(rem, 96, 120)} | {percentage(rem, total)} | 96–120 min |
-| Tiempo despierto | {duration(awake)} | ⚪ | — | Variable |
+| Sueño total | {duration(total)} | {total_status} | {total_pct} | 7–9 h |
+| Sueño profundo | {duration(deep, True)} | {phase_status(deep, 72, 120)} | {percentage(deep, total)} | 72–120 min |
+| Sueño ligero | {duration(light)} | - | {percentage(light, total)} | Sin objetivo |
+| Sueño REM | {duration(rem, True)} | {phase_status(rem, 96, 120)} | {percentage(rem, total)} | 96–120 min |
+| Tiempo despierto | {duration(awake)} | - | - | Variable |
 
 ---
 
