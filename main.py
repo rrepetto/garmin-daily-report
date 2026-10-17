@@ -22,6 +22,26 @@ def percentage(seconds, total):
 
     return f"{seconds / total * 100:.0f}%"
 
+def status(value, minimum, maximum, tolerance):
+    if value is None:
+        return "⚪"
+
+    if minimum <= value <= maximum:
+        return "🟢 ✅"
+
+    if minimum - tolerance <= value <= maximum + tolerance:
+        return "🟡 ⚠️"
+
+    return "🔴 ❌"
+
+
+def phase_status(seconds, total, minimum, maximum):
+    if seconds is None or not total:
+        return "⚪"
+
+    pct = seconds / total * 100
+    return status(pct, minimum, maximum, 5)
+
 def get_latest_sleep(garmin):
     today = datetime.now(TIMEZONE).date()
 
@@ -49,23 +69,36 @@ def main():
 
     total = sleep.get("sleepTimeSeconds")
 
+        total = sleep.get("sleepTimeSeconds")
+
+    deep = sleep.get("deepSleepSeconds")
+    light = sleep.get("lightSleepSeconds")
+    rem = sleep.get("remSleepSeconds")
+    awake = sleep.get("awakeSleepSeconds")
+
+    total_status = status(
+        total / 3600 if total is not None else None,
+        7, 9, 1
+    )
+
     report = f"""# Garmin — Sueño del {date_str}
 
 ## Resumen
 
-| Métrica | Duración | % | Referencia adultos |
-|---|---|---|---|
-| Sueño total | {duration(total)} | 100% | 7–9 h |
-| Sueño profundo | {duration(sleep.get('deepSleepSeconds'))} | {percentage(sleep.get('deepSleepSeconds'), total)} | 15–25% |
-| Sueño ligero | {duration(sleep.get('lightSleepSeconds'))} | {percentage(sleep.get('lightSleepSeconds'), total)} | ~50–60% |
-| Sueño REM | {duration(sleep.get('remSleepSeconds'))} | {percentage(sleep.get('remSleepSeconds'), total)} | 20–25% |
-| Tiempo despierto | {duration(sleep.get('awakeSleepSeconds'))} | — | Variable |
+| Métrica | Duración | Estado | % | Referencia adultos |
+|---|---|---|---|---|
+| Sueño total | {duration(total)} | {total_status} | 100% | 7–9 h |
+| Sueño profundo | {duration(deep)} | {phase_status(deep, total, 15, 25)} | {percentage(deep, total)} | 15–25% |
+| Sueño ligero | {duration(light)} | {phase_status(light, total, 50, 60)} | {percentage(light, total)} | ~50–60% |
+| Sueño REM | {duration(rem)} | {phase_status(rem, total, 20, 25)} | {percentage(rem, total)} | 20–25% |
+| Tiempo despierto | {duration(awake)} | ⚪ | — | Variable |
 
 ---
 
-*Referencias orientativas para adultos. Las proporciones
-varían con la edad y no constituyen objetivos médicos
-individuales.*
+**Estados:** 🟢 En rango · 🟡 Cerca del rango · 🔴 Fuera del rango · ⚪ Sin evaluación.
+
+*Referencias orientativas. Los porcentajes de fases no son
+umbrales médicos y Garmin proporciona estimaciones.*
 
 Generado automáticamente desde Garmin Connect.
 """
