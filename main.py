@@ -49,7 +49,7 @@ def main():
 
     total = sleep.get("sleepTimeSeconds")
 
-report = f"""# Garmin — Sueño del {date_str}
+    report = f"""# Garmin — Sueño del {date_str}
 
 ## Resumen
 
