@@ -69,8 +69,6 @@ def main():
 
     total = sleep.get("sleepTimeSeconds")
 
-    total = sleep.get("sleepTimeSeconds")
-
     deep = sleep.get("deepSleepSeconds")
     light = sleep.get("lightSleepSeconds")
     rem = sleep.get("remSleepSeconds")
