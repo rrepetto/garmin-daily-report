@@ -16,6 +16,11 @@ def duration(seconds):
     minutes = round(seconds / 60)
     return f"{minutes // 60} h {minutes % 60} min"
 
+def percentage(seconds, total):
+    if seconds is None or not total:
+        return "Sin datos"
+
+    return f"{seconds / total * 100:.0f}%"
 
 def get_latest_sleep(garmin):
     today = datetime.now(TIMEZONE).date()
@@ -42,19 +47,26 @@ def main():
 
     date_str, sleep = get_latest_sleep(garmin)
 
-    report = f"""# Garmin — Sueño del {date_str}
+    total = sleep.get("sleepTimeSeconds")
+
+report = f"""# Garmin — Sueño del {date_str}
 
 ## Resumen
 
-| Métrica | Valor |
-|---|---|
-| Sueño total | {duration(sleep.get('sleepTimeSeconds'))} |
-| Sueño profundo | {duration(sleep.get('deepSleepSeconds'))} |
-| Sueño ligero | {duration(sleep.get('lightSleepSeconds'))} |
-| Sueño REM | {duration(sleep.get('remSleepSeconds'))} |
-| Tiempo despierto | {duration(sleep.get('awakeSleepSeconds'))} |
+| Métrica | Duración | % | Referencia adultos |
+|---|---|---|---|
+| Sueño total | {duration(total)} | 100% | 7–9 h |
+| Sueño profundo | {duration(sleep.get('deepSleepSeconds'))} | {percentage(sleep.get('deepSleepSeconds'), total)} | 15–25% |
+| Sueño ligero | {duration(sleep.get('lightSleepSeconds'))} | {percentage(sleep.get('lightSleepSeconds'), total)} | ~50–60% |
+| Sueño REM | {duration(sleep.get('remSleepSeconds'))} | {percentage(sleep.get('remSleepSeconds'), total)} | 20–25% |
+| Tiempo despierto | {duration(sleep.get('awakeSleepSeconds'))} | — | Variable |
 
 ---
+
+*Referencias orientativas para adultos. Las proporciones
+varían con la edad y no constituyen objetivos médicos
+individuales.*
+
 Generado automáticamente desde Garmin Connect.
 """
 
