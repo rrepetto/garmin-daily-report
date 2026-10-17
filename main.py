@@ -48,7 +48,7 @@ def phase_status(seconds, total, minimum, maximum):
 def get_latest_sleep(garmin):
     today = datetime.now(TIMEZONE).date()
 
-    for offset in range(1, 4):
+    for offset in range(0, 4):
         day = today - timedelta(days=offset)
         date_str = day.isoformat()
 
