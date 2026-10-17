@@ -125,7 +125,16 @@ Generado automáticamente desde Garmin Connect.
         reverse=True
     )
 
-    index = "# Garmin — Reportes de sueño\n\n"
+    now = datetime.now(TIMEZONE)
+    last_run = now.strftime("%d/%m/%Y a las %H:%M")
+
+    index = f"""# Garmin — Reportes de sueño
+
+**Última consulta exitosa a Garmin:** {last_run} (Argentina)
+
+## Reportes
+
+"""
 
     for path in reports:
         index += f"- [{path.stem}](reports/{path.name})\n"
