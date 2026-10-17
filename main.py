@@ -107,14 +107,23 @@ Generado automáticamente desde Garmin Connect.
     Path("reports").mkdir(exist_ok=True)
     file = Path(f"reports/{date_str}.md")
 
-    if file.exists():
+    if not file.exists():
+        file.write_text(report, encoding="utf-8")
+        print(f"Informe generado: {file}")
+    else:
         print(f"El informe ya existe: {file}")
-        return
 
-    file.write_text(report, encoding="utf-8")
+    # Generar índice con todos los reportes
+    reports = sorted(
+        Path("reports").glob("????-??-??.md"),
+        reverse=True
+    )
 
-    print(f"Informe generado: {file}")
+    index = "# Garmin — Reportes de sueño\n\n"
 
+    for path in reports:
+        index += f"- [{path.stem}](reports/{path.name})\n"
 
-if __name__ == "__main__":
-    main()
+    Path("index.md").write_text(index, encoding="utf-8")
+
+    print(f"Índice actualizado con {len(reports)} reportes")
