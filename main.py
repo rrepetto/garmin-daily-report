@@ -6,10 +6,7 @@ from zoneinfo import ZoneInfo
 from garminconnect import Garmin
 
 
-# Fecha de ayer en Argentina
-timezone = ZoneInfo("America/Argentina/Buenos_Aires")
-day = (datetime.now(timezone) - timedelta(days=1)).date()
-date_str = day.isoformat()
+TIMEZONE = ZoneInfo("America/Argentina/Buenos_Aires")
 
 
 def duration(seconds):
@@ -20,44 +17,32 @@ def duration(seconds):
     return f"{minutes // 60} h {minutes % 60} min"
 
 
-# Conectar a Garmin Connect
-garmin = Garmin(
-    os.environ["GARMIN_EMAIL"],
-    os.environ["GARMIN_PASSWORD"]
-)
+def get_latest_sleep(garmin):
+    today = datetime.now(TIMEZONE).date()
 
-garmin.login()
-print("Login Garmin completado correctamente")
+    for offset in range(1, 4):
+        day = today - timedelta(days=offset)
+        date_str = day.isoformat()
 
-# Verificar acceso a la API
-stats = garmin.get_stats(date_str)
-print("Consulta de estadísticas completada")
-print("Fecha consultada:", date_str)
+        data = garmin.get_sleep_data(date_str)
+        sleep = (data or {}).get("dailySleepDTO") or {}
 
-# Consultar sueño
-# Buscar datos de sueño en los últimos 3 días
-for offset in range(1, 4):
-    test_date = (
-        datetime.now(timezone) - timedelta(days=offset)
-    ).date().isoformat()
+        if sleep.get("sleepTimeSeconds"):
+            return date_str, sleep
 
-    data = garmin.get_sleep_data(test_date)
-    sleep = (data or {}).get("dailySleepDTO") or {}
+    raise RuntimeError("No se encontraron datos de sueño")
 
-    print(f"\nFecha: {test_date}")
-    print("Sueño total:", sleep.get("sleepTimeSeconds"))
-    print("Profundo:", sleep.get("deepSleepSeconds"))
-    print("Ligero:", sleep.get("lightSleepSeconds"))
-    print("REM:", sleep.get("remSleepSeconds"))
-    print("Campos disponibles:", list(sleep.keys()))
 
-#if not sleep.get("sleepTimeSeconds"):
-#    raise RuntimeError(
-#        f"No hay información de sueño para {date_str}"
-#    )
+def main():
+    garmin = Garmin(
+        os.environ["GARMIN_EMAIL"],
+        os.environ["GARMIN_PASSWORD"]
+    )
+    garmin.login()
 
-# Generar informe Markdown
-report = f"""# Garmin — Sueño del {date_str}
+    date_str, sleep = get_latest_sleep(garmin)
+
+    report = f"""# Garmin — Sueño del {date_str}
 
 ## Resumen
 
@@ -73,9 +58,17 @@ report = f"""# Garmin — Sueño del {date_str}
 Generado automáticamente desde Garmin Connect.
 """
 
-# Guardar informe
-Path("reports").mkdir(exist_ok=True)
-file = Path(f"reports/{date_str}.md")
-file.write_text(report, encoding="utf-8")
+    Path("reports").mkdir(exist_ok=True)
+    file = Path(f"reports/{date_str}.md")
 
-print(f"Informe generado: {file}")
+    if file.exists():
+        print(f"El informe ya existe: {file}")
+        return
+
+    file.write_text(report, encoding="utf-8")
+
+    print(f"Informe generado: {file}")
+
+
+if __name__ == "__main__":
+    main()
