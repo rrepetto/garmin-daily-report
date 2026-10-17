@@ -61,8 +61,8 @@ def get_latest_sleep(garmin):
     f"CalendarDate: {sleep.get('calendarDate')}"
     )
 
-        if sleep.get("sleepTimeSeconds"):
-            return date_str, sleep
+    if sleep.get("sleepTimeSeconds"):
+        return date_str, sleep
 
     raise RuntimeError("No se encontraron datos de sueño")
 
