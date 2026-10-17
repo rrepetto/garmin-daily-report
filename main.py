@@ -35,18 +35,26 @@ print("Consulta de estadísticas completada")
 print("Fecha consultada:", date_str)
 
 # Consultar sueño
-data = garmin.get_sleep_data(date_str)
+# Buscar datos de sueño en los últimos 3 días
+for offset in range(1, 4):
+    test_date = (
+        datetime.now(timezone) - timedelta(days=offset)
+    ).date().isoformat()
 
-sleep = (data or {}).get("dailySleepDTO") or {}
+    data = garmin.get_sleep_data(test_date)
+    sleep = (data or {}).get("dailySleepDTO") or {}
 
-print("Datos de sueño recibidos:", bool(sleep))
-print("Duración del sueño:", sleep.get("sleepTimeSeconds"))
-sleep = (data or {}).get("dailySleepDTO") or {}
+    print(f"\nFecha: {test_date}")
+    print("Sueño total:", sleep.get("sleepTimeSeconds"))
+    print("Profundo:", sleep.get("deepSleepSeconds"))
+    print("Ligero:", sleep.get("lightSleepSeconds"))
+    print("REM:", sleep.get("remSleepSeconds"))
+    print("Campos disponibles:", list(sleep.keys()))
 
-if not sleep.get("sleepTimeSeconds"):
-    raise RuntimeError(
-        f"No hay información de sueño para {date_str}"
-    )
+#if not sleep.get("sleepTimeSeconds"):
+#    raise RuntimeError(
+#        f"No hay información de sueño para {date_str}"
+#    )
 
 # Generar informe Markdown
 report = f"""# Garmin — Sueño del {date_str}
