@@ -27,9 +27,20 @@ garmin = Garmin(
 )
 
 garmin.login()
+print("Login Garmin completado correctamente")
 
-# Obtener información del sueño
+# Verificar acceso a la API
+stats = garmin.get_stats(date_str)
+print("Consulta de estadísticas completada")
+print("Fecha consultada:", date_str)
+
+# Consultar sueño
 data = garmin.get_sleep_data(date_str)
+
+sleep = (data or {}).get("dailySleepDTO") or {}
+
+print("Datos de sueño recibidos:", bool(sleep))
+print("Duración del sueño:", sleep.get("sleepTimeSeconds"))
 sleep = (data or {}).get("dailySleepDTO") or {}
 
 if not sleep.get("sleepTimeSeconds"):
