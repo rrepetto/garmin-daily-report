@@ -30,6 +30,11 @@ def percentage(seconds, total):
 
     return f"{seconds / total * 100:.0f}%"
 
+def target_percentage(seconds, target_minutes):
+    if seconds is None:
+        return "Sin datos"
+
+    return f"{seconds / (target_minutes * 60) * 100:.0f}%"
 
 def status(value, minimum, maximum, tolerance):
     if value is None:
@@ -79,12 +84,12 @@ def generate_report(date_str, sleep):
 
 ## Resumen
 
-| Métrica | Duración | Estado | % | Referencia adultos |
+| Métrica | Duración | Estado | % objetivo | Referencia adultos |
 |---|---|---|---|---|
 | Sueño total | {duration(total)} | {total_status} | {total_pct} | 7–9 h |
-| Sueño profundo | {duration(deep, True)} | {phase_status(deep, 72, 120)} | {percentage(deep, total)} | 72–120 min |
-| Sueño ligero | {duration(light)} | - | {percentage(light, total)} | Sin objetivo |
-| Sueño REM | {duration(rem, True)} | {phase_status(rem, 96, 120)} | {percentage(rem, total)} | 96–120 min |
+| Sueño profundo | {duration(deep, True)} | {phase_status(deep, 72, 120)} | {target_percentage(deep, 72)} | 72–120 min |
+| Sueño ligero | {duration(light)} | - | - | Sin objetivo |
+| Sueño REM | {duration(rem, True)} | {phase_status(rem, 96, 120)} | {target_percentage(rem, 96)} | 96–120 min |
 | Tiempo despierto | {duration(awake)} | - | - | Variable |
 
 ---
