@@ -26,10 +26,13 @@ def status(value, minimum, maximum, tolerance):
     if value is None:
         return "⚪"
 
-    if minimum <= value <= maximum:
+    if value > maximum:
+        return "⚪"
+
+    if value >= minimum:
         return "🟢 ✅"
 
-    if minimum - tolerance <= value <= maximum + tolerance:
+    if value >= minimum - tolerance:
         return "🟡 ⚠️"
 
     return "🔴 ❌"
