@@ -1,9 +1,10 @@
 # Garmin — Reportes de sueño
 
-**Última consulta exitosa a Garmin:** 06/11/2026 a las 17:51 (Argentina)
+**Última consulta exitosa a Garmin:** 07/11/2026 a las 16:24 (Argentina)
 
 ## Reportes
 
+- [2026-11-07](reports/2026-11-07.md)
 - [2026-11-06](reports/2026-11-06.md)
 - [2026-11-05](reports/2026-11-05.md)
 - [2026-11-04](reports/2026-11-04.md)
